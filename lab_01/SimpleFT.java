@@ -48,6 +48,21 @@ public class SimpleFT {
         Display2dFT display2 =
                 new Display2dFT(CRe, CIm, N, "Discrete FT") ;
 
+                  int cutoff = N/8 ;  // for example
+          for(int k = 0 ; k < N ; k++) {
+              int kSigned = k <= N/2 ? k : k - N ;
+              for(int l = 0 ; l < N ; l++) {
+                  int lSigned = l <= N/2 ? l : l - N ;
+                  if(Math.abs(kSigned) > cutoff || Math.abs(lSigned) > cutoff) {
+                      CRe [k] [l] = 0 ;
+                      CIm [k] [l] = 0 ;
+                  }
+              }
+          }
+
+          Display2dFT display2a =
+                  new Display2dFT(CRe, CIm, N, "Truncated FT") ;
+
 
     //   Now do inverse FT
         double [] [] reconstructed = new double [N] [N] ;
