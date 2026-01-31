@@ -45,23 +45,22 @@ public class SimpleFT {
             System.out.println("Completed FT line " + k + " out of " + N) ;
         }
 
-        Display2dFT display2 =
-                new Display2dFT(CRe, CIm, N, "Discrete FT") ;
+        // Display2dFT display2 = new Display2dFT(CRe, CIm, N, "Discrete FT") ;
 
-                  int cutoff = N/8 ;  // for example
-          for(int k = 0 ; k < N ; k++) {
-              int kSigned = k <= N/2 ? k : k - N ;
-              for(int l = 0 ; l < N ; l++) {
-                  int lSigned = l <= N/2 ? l : l - N ;
-                  if(Math.abs(kSigned) > cutoff || Math.abs(lSigned) > cutoff) {
-                      CRe [k] [l] = 0 ;
-                      CIm [k] [l] = 0 ;
-                  }
-              }
-          }
+        // int cutoff = N/8 ;  // for example
+        // for(int k = 0 ; k < N ; k++) {
+        //     int kSigned = k <= N/2 ? k : k - N ;
+        //     for(int l = 0 ; l < N ; l++) {
+        //         int lSigned = l <= N/2 ? l : l - N ;
+        //         if (Math.abs(kSigned) <= cutoff && Math.abs(lSigned) <= cutoff) { // high pass filter, commment out the line BELOW to work !!
+        //         // if(Math.abs(kSigned) > cutoff || Math.abs(lSigned) > cutoff) { // low pass filter, commment out the line ABOVE to work !!
+        //             CRe [k] [l] = 0 ;
+        //             CIm [k] [l] = 0 ;
+        //         }
+        //     }
+        // }
 
-          Display2dFT display2a =
-                  new Display2dFT(CRe, CIm, N, "Truncated FT") ;
+        // Display2dFT display2a = new Display2dFT(CRe, CIm, N, "Truncated FT") ;
 
 
     //   Now do inverse FT
@@ -90,7 +89,7 @@ public class SimpleFT {
                 new DisplayDensity(reconstructed, N, "Reconstructed Image") ;
 
         //   save reconstructed image
-        saveToPGM(reconstructed, "reconstructed_wolf.pgm");
+        saveToPGM(reconstructed, "reconstructed_wolf_with_NO_pass_filter.pgm");
 
     }
 
