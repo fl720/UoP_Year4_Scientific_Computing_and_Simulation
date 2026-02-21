@@ -74,15 +74,15 @@ public class Sinogram {
 
         // 2. Apply the Ramp Filter |K| ======== BACK PROJECTION ========
         for (int iTheta = 0; iTheta < N; iTheta++) {
-            // !!!! ramp fileter ----------------------------------------------
-            // for (int iK = 0; iK < N; iK++) {
-            //     // Determine the signed wave number 
-            //     int kSigned = (iK <= N / 2) ? iK : iK - N;
+            //  ramp fileter ----------------------------------------------
+            for (int iK = 0; iK < N; iK++) {
+                // Determine the signed wave number 
+                int kSigned = (iK <= N / 2) ? iK : iK - N;
                 
-            //     // Multiply FT by abs(kSigned) 
-            //     sinogramFTRe[iTheta][iK] *= Math.abs(kSigned);
-            //     sinogramFTIm[iTheta][iK] *= Math.abs(kSigned);
-            // }
+                // Multiply FT by abs(kSigned) 
+                sinogramFTRe[iTheta][iK] *= Math.abs(kSigned);
+                sinogramFTIm[iTheta][iK] *= Math.abs(kSigned);
+            }
             // Low pass cosine filter (optional) --------------------------------
             for (int iK = 0; iK < N; iK++) {
                 int kSigned = (iK <= N / 2) ? iK : iK - N;
