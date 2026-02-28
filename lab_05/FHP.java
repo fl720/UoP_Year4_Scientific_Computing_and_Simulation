@@ -10,7 +10,7 @@ public class FHP {
     final static int NITER = 1000 ;
     final static int DELAY = 500 ;
 
-    final static double DENSITY = 1.0 ;  // initial state, between 0 and 1.0.
+    final static double DENSITY = 0.1 ;  // initial state, between 0 and 1.0.
 
     static Display display = new Display() ;
 
@@ -335,4 +335,3 @@ public class FHP {
         }
     }
 }
-F
