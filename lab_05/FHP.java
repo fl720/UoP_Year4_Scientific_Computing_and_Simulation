@@ -1,4 +1,3 @@
-
 import java.awt.* ;
 import javax.swing.* ;
 
@@ -8,11 +7,15 @@ public class FHP {
     final static int q = 6 ;  // population
      
     final static int NITER = 1000 ;
-    final static int DELAY = 500 ;
+    final static int DELAY = 50 ; // Reduced delay for faster visualization, feel free to adjust
 
-    final static double DENSITY = 0.1 ;  // initial state, between 0 and 1.0.
+    final static double DENSITY = 0.5 ;  // initial state, between 0 and 1.0.
 
-    static Display display = new Display() ;
+    // Toggle the displays below just like in HPP.java
+    // static Display display = new Display() ;
+    static Display_grey display = new Display_grey() ;
+    // static Display_average_neighbour display = new Display_average_neighbour() ;
+    // static Display_average_neighbour_closed display = new Display_average_neighbour_closed() ;
 
     static boolean [] [] [] fin = new boolean [NX] [NY] [q] ;
     static boolean [] [] [] fout = new boolean [NX] [NY] [q] ;
@@ -37,7 +40,6 @@ public class FHP {
         for(int iter = 0 ; iter < NITER ; iter++) {
 
             // Collision
-
             for(int i = 0; i < NX ; i++) { 
                 for(int j = 0; j < NY ; j++) { 
                     boolean [] fin_ij = fin [i] [j] ;
@@ -183,22 +185,57 @@ public class FHP {
                     }
                 }
             }
-
             // Streaming
-
             for(int i = 0; i < NX ; i++) { 
-                int iP1 = (i + 1) % NX ;
-                int iM1 = (i - 1 + NX) % NX ;
                 for(int j = 0; j < NY ; j++) { 
+                    
+                    // ----- cylindrical boundary conditions: -----
+                    int iP1 = (i + 1) % NX ;
+                    int iM1 = (i - 1 + NX) % NX ;
                     int jP1 = (j + 1) % NY ;
                     int jM1 = (j - 1 + NY) % NY ;
 
+                    // Push the particles to their new cells
                     fin [iM1] [j] [0] = fout [i] [j] [0] ;
                     fin [iP1] [j] [1] = fout [i] [j] [1] ;
                     fin [i] [jM1] [2] = fout [i] [j] [2] ;
                     fin [i] [jP1] [3] = fout [i] [j] [3] ;
                     fin [iP1] [jM1] [4] = fout [i] [j] [4] ;
                     fin [iM1] [jP1] [5] = fout [i] [j] [5] ;
+                    
+
+                    // ----- Streaming (Closed Box Boundary / Bounce-back) -----
+                    // if (i < NX - 1) {
+                    //     fin[i][j][0] = fout[i+1][j][0];
+                    // } else {
+                    //     fin[i][j][0] = fout[i][j][1];
+                    // }
+                    // if (i > 0) {
+                    //     fin[i][j][1] = fout[i-1][j][1];
+                    // } else {
+                    //     fin[i][j][1] = fout[i][j][0];
+                    // }
+                    // if (j < NY - 1) {
+                    //     fin[i][j][2] = fout[i][j+1][2];
+                    // } else {
+                    //     fin[i][j][2] = fout[i][j][3];
+                    // }
+                    // if (j > 0) {
+                    //     fin[i][j][3] = fout[i][j-1][3];
+                    // } else {
+                    //     fin[i][j][3] = fout[i][j][2];
+                    // }
+                    // if (i > 0 && j < NY - 1) {
+                    //     fin[i][j][4] = fout[i-1][j+1][4];
+                    // } else {
+                    //     fin[i][j][4] = fout[i][j][5];
+                    // }
+                    // if (i < NX - 1 && j > 0) {
+                    //     fin[i][j][5] = fout[i+1][j-1][5];
+                    // } else {
+                    //     fin[i][j][5] = fout[i][j][4];
+                    // }
+                
                 }
             }
 
@@ -234,7 +271,7 @@ public class FHP {
 
             setPreferredSize(new Dimension(displaySizeX, displaySizeY)) ;
 
-            JFrame frame = new JFrame("HPP");
+            JFrame frame = new JFrame("FHP");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setContentPane(this);
             frame.pack();
@@ -249,7 +286,6 @@ public class FHP {
             int [] tri_x = new int [3], tri_y = new int [3] ;
             for(int i = 0 ; i < NX ; i++) {
                 for(int j = 0 ; j < NY ; j++) {
-                    //boolean [] f_ij = fout [i] [j] ;
                     boolean [] f_ij = fin [i] [j] ;
                     int originX = 
                       (int) (CELL_SIZE * i + 0.5 * CELL_SIZE * j +
@@ -258,78 +294,191 @@ public class FHP {
                       (int) (ROW_HEIGHT * (CELL_SIZE * j + CELL_SIZE/2) + 0.5) ;
 
                     g.setColor(Color.PINK) ;
-                    //g.setColor(Color.LIGHT_GRAY) ;
                     g.fillOval(originX - 2, originY - 2, 4, 4) ;
 
                     g.setColor(Color.BLUE) ;
                     if(f_ij [0]) {
-                        tri_x [0] = originX - ARROW_START ;
-                        tri_x [1] = originX - ARROW_START ;
-                        tri_x [2] = originX - ARROW_END ;
-                        tri_y [0] = originY - ARROW_WIDE ;
-                        tri_y [1] = originY + ARROW_WIDE ;
-                        tri_y [2] = originY ;
-                        //g.setColor(Color.BLUE) ;
+                        tri_x [0] = originX - ARROW_START ; tri_x [1] = originX - ARROW_START ; tri_x [2] = originX - ARROW_END ;
+                        tri_y [0] = originY - ARROW_WIDE ;  tri_y [1] = originY + ARROW_WIDE ;  tri_y [2] = originY ;
                         g.fillPolygon(tri_x, tri_y, 3) ;
                     }
                     if(f_ij [1]) {
-                        tri_x [0] = originX + ARROW_START ;
-                        tri_x [1] = originX + ARROW_START ;
-                        tri_x [2] = originX + ARROW_END ;
-                        tri_y [0] = originY - ARROW_WIDE ;
-                        tri_y [1] = originY + ARROW_WIDE ;
-                        tri_y [2] = originY ;
-                        //g.setColor(Color.RED) ;
+                        tri_x [0] = originX + ARROW_START ; tri_x [1] = originX + ARROW_START ; tri_x [2] = originX + ARROW_END ;
+                        tri_y [0] = originY - ARROW_WIDE ;  tri_y [1] = originY + ARROW_WIDE ;  tri_y [2] = originY ;
                         g.fillPolygon(tri_x, tri_y, 3) ;
                     }
                     if(f_ij [2]) {
-                        tri_x [0] = originX - DIAG_X_0 ;
-                        tri_x [1] = originX - DIAG_X_1 ;
-                        tri_x [2] = originX - DIAG_X_2 ;
-                        tri_y [0] = originY - DIAG_Y_0 ;
-                        tri_y [1] = originY - DIAG_Y_1 ;
-                        tri_y [2] = originY - DIAG_Y_2 ;
-                        //g.setColor(Color.ORANGE) ;
+                        tri_x [0] = originX - DIAG_X_0 ; tri_x [1] = originX - DIAG_X_1 ; tri_x [2] = originX - DIAG_X_2 ;
+                        tri_y [0] = originY - DIAG_Y_0 ; tri_y [1] = originY - DIAG_Y_1 ; tri_y [2] = originY - DIAG_Y_2 ;
                         g.fillPolygon(tri_x, tri_y, 3) ;
                     }
                     if(f_ij [3]) {
-                        tri_x [0] = originX + DIAG_X_0 ;
-                        tri_x [1] = originX + DIAG_X_1 ;
-                        tri_x [2] = originX + DIAG_X_2 ;
-                        tri_y [0] = originY + DIAG_Y_0 ;
-                        tri_y [1] = originY + DIAG_Y_1 ;
-                        tri_y [2] = originY + DIAG_Y_2 ;
-/*
-                        tri_x [0] = originX + 1 - 2 ;
-                        tri_x [1] = originX + 1 + 2 ;
-                        tri_x [2] = originX + 4 ;
-                        tri_y [0] = originY + 2 + 2 ;
-                        tri_y [1] = originY + 2 - 2 ;
-                        tri_y [2] = originY + 6 ;
-*/
-                        //g.setColor(Color.MAGENTA) ;
+                        tri_x [0] = originX + DIAG_X_0 ; tri_x [1] = originX + DIAG_X_1 ; tri_x [2] = originX + DIAG_X_2 ;
+                        tri_y [0] = originY + DIAG_Y_0 ; tri_y [1] = originY + DIAG_Y_1 ; tri_y [2] = originY + DIAG_Y_2 ;
                         g.fillPolygon(tri_x, tri_y, 3) ;
                     }
                     if(f_ij [4]) {
-                        tri_x [0] = originX + DIAG_X_0 ;
-                        tri_x [1] = originX + DIAG_X_1 ;
-                        tri_x [2] = originX + DIAG_X_2 ;
-                        tri_y [0] = originY - DIAG_Y_0 ;
-                        tri_y [1] = originY - DIAG_Y_1 ;
-                        tri_y [2] = originY - DIAG_Y_2 ;
-                        //g.setColor(Color.GREEN) ;
+                        tri_x [0] = originX + DIAG_X_0 ; tri_x [1] = originX + DIAG_X_1 ; tri_x [2] = originX + DIAG_X_2 ;
+                        tri_y [0] = originY - DIAG_Y_0 ; tri_y [1] = originY - DIAG_Y_1 ; tri_y [2] = originY - DIAG_Y_2 ;
                         g.fillPolygon(tri_x, tri_y, 3) ;
                     }
                     if(f_ij [5]) {
-                        tri_x [0] = originX - DIAG_X_0 ;
-                        tri_x [1] = originX - DIAG_X_1 ;
-                        tri_x [2] = originX - DIAG_X_2 ;
-                        tri_y [0] = originY + DIAG_Y_0 ;
-                        tri_y [1] = originY + DIAG_Y_1 ;
-                        tri_y [2] = originY + DIAG_Y_2 ;
-                        //g.setColor(Color.YELLOW) ;
+                        tri_x [0] = originX - DIAG_X_0 ; tri_x [1] = originX - DIAG_X_1 ; tri_x [2] = originX - DIAG_X_2 ;
+                        tri_y [0] = originY + DIAG_Y_0 ; tri_y [1] = originY + DIAG_Y_1 ; tri_y [2] = originY + DIAG_Y_2 ;
                         g.fillPolygon(tri_x, tri_y, 3) ;
                     }
+                }
+            } 
+        }
+    }
+
+    static class Display_grey extends JPanel {
+
+        static final double ROW_HEIGHT = Math.sqrt(3) / 2 ;
+        final static int CELL_SIZE = 14 ; 
+        
+        int displaySizeX = CELL_SIZE * NX ;
+        int displaySizeY = (int) (ROW_HEIGHT * CELL_SIZE * NY + 0.5) ;
+
+        Display_grey() {
+            setPreferredSize(new Dimension(displaySizeX, displaySizeY)) ;
+
+            JFrame frame = new JFrame("FHP - Density Map");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setContentPane(this);
+            frame.pack();
+            frame.setVisible(true);
+        }
+
+        public void paintComponent(Graphics g) {
+            
+            for(int i = 0 ; i < NX ; i++) {
+                for(int j = 0 ; j < NY ; j++) {
+                    boolean [] fin_ij = fin [i] [j] ;
+                    
+                    int density = 0;
+                    for (int d = 0; d < q; d++) {
+                        if (fin_ij[d]) density++;
+                    }
+                    
+                    // density = 0 -> grayValue = 255 (white)
+                    // density = 6 -> grayValue = 0 (black)
+                    int grayValue = 255 - (density * 255 / q);
+                    g.setColor(new Color(grayValue, grayValue, grayValue));
+                    
+                    int originX = (int) (CELL_SIZE * i + 0.5 * CELL_SIZE * j + 0.5) % displaySizeX;
+                    int originY = (int) (ROW_HEIGHT * (CELL_SIZE * j) + 0.5) ;
+                    g.fillRect(originX, originY, CELL_SIZE, CELL_SIZE) ;
+                }
+            } 
+        }
+    }
+
+    static class Display_average_neighbour extends JPanel {
+
+        static final double ROW_HEIGHT = Math.sqrt(3) / 2 ;
+        final static int CELL_SIZE = 14 ; 
+        
+        int displaySizeX = CELL_SIZE * NX ;
+        int displaySizeY = (int) (ROW_HEIGHT * CELL_SIZE * NY + 0.5) ;
+
+        Display_average_neighbour() {
+            setPreferredSize(new Dimension(displaySizeX, displaySizeY)) ;
+
+            JFrame frame = new JFrame("FHP - 3x3 Average Density");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setContentPane(this);
+            frame.pack();
+            frame.setVisible(true);
+        }
+
+        public void paintComponent(Graphics g) {
+            
+            g.setColor(Color.WHITE) ;
+            g.fillRect(0, 0, displaySizeX, displaySizeY) ;
+
+            for(int i = 0 ; i < NX ; i++) {
+                for(int j = 0 ; j < NY ; j++) {
+                    
+                    int totalDensity = 0;
+                    
+                    for (int di = -1; di <= 1; di++) {
+                        for (int dj = -1; dj <= 1; dj++) {
+                            int ni = (i + di + NX) % NX;
+                            int nj = (j + dj + NY) % NY;
+                            
+                            boolean[] f = fin[ni][nj];
+                            for(int d=0; d<q; d++) {
+                                if (f[d]) totalDensity++;
+                            }
+                        }
+                    }
+                    
+                    // Max density for a 3x3 block in FHP is 9 cells * 6 directions = 54
+                    int grayValue = 255 - (totalDensity * 255 / (9 * q));
+                    grayValue = Math.max(0, Math.min(255, grayValue));
+                    
+                    g.setColor(new Color(grayValue, grayValue, grayValue));
+                    int originX = (int) (CELL_SIZE * i + 0.5 * CELL_SIZE * j + 0.5) % displaySizeX;
+                    int originY = (int) (ROW_HEIGHT * (CELL_SIZE * j) + 0.5) ;
+                    g.fillRect(originX, originY, CELL_SIZE, CELL_SIZE) ;
+                }
+            } 
+        }
+    }
+
+    static class Display_average_neighbour_closed extends JPanel {
+
+        static final double ROW_HEIGHT = Math.sqrt(3) / 2 ;
+        final static int CELL_SIZE = 14 ; 
+        
+        int displaySizeX = CELL_SIZE * NX ;
+        int displaySizeY = (int) (ROW_HEIGHT * CELL_SIZE * NY + 0.5) ;
+
+        Display_average_neighbour_closed() {
+            setPreferredSize(new Dimension(displaySizeX, displaySizeY)) ;
+
+            JFrame frame = new JFrame("FHP - 3x3 Average Density in Closed Box");
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+            frame.setContentPane(this);
+            frame.pack();
+            frame.setVisible(true);
+        }
+
+        public void paintComponent(Graphics g) {
+            g.setColor(Color.WHITE) ;
+            g.fillRect(0, 0, displaySizeX, displaySizeY) ;
+
+            for(int i = 0 ; i < NX ; i++) {
+                for(int j = 0 ; j < NY ; j++) {
+                    
+                    int totalDensity = 0;
+                    int validCells = 0; 
+                    
+                    for (int di = -1; di <= 1; di++) {
+                        for (int dj = -1; dj <= 1; dj++) {
+                            
+                            int ni = i + di;
+                            int nj = j + dj;
+                            
+                            if (ni >= 0 && ni < NX && nj >= 0 && nj < NY) {
+                                validCells++; 
+                                
+                                boolean[] f = fin[ni][nj];
+                                for(int d=0; d<q; d++) {
+                                    if (f[d]) totalDensity++;
+                                }
+                            }
+                        }
+                    }
+                    int maxPossibleDensity = validCells * q;
+                    int grayValue = 255 - (totalDensity * 255 / maxPossibleDensity);
+                    grayValue = Math.max(0, Math.min(255, grayValue));
+                    
+                    g.setColor(new Color(grayValue, grayValue, grayValue));
+                    int originX = (int) (CELL_SIZE * i + 0.5 * CELL_SIZE * j + 0.5) % displaySizeX;
+                    int originY = (int) (ROW_HEIGHT * (CELL_SIZE * j) + 0.5) ;
+                    g.fillRect(originX, originY, CELL_SIZE, CELL_SIZE) ;
                 }
             } 
         }
