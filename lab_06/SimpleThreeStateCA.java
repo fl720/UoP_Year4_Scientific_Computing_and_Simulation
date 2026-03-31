@@ -38,8 +38,8 @@ public class SimpleThreeStateCA {
             System.out.println("iter = " + iter++);
 
             // Chop wave when half-way up.
-            if (iter == N / 2) {
-                for (int i = 0; i < N / 2; i++) {
+            if (iter == 2) {
+                for (int i = 0; i < 2; i++) {
                     for (int j = 0; j < N; j++) {
                         state[i][j] = 0;
                     }

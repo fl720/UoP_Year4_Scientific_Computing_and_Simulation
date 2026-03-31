@@ -6,13 +6,13 @@ public class GerhardtSchusterTyson {
 
     final static int N = 200;
     final static int CELL_SIZE = 1;
-    final static int DELAY = 10;
+    final static int DELAY = 20;
 
     // 8 Parameters, original settings: 100, 70, 65, 20, 5, 0, 5, 3
     final static int V_MAX = 100;	// Maximum possible value for v
     final static int V_RECO = 70;	// In order to a cell jumps to the recovery state, V_RECO < v
     final static int V_EXCI = 65;	// To get a cell excited, v <= V_EXCI
-    final static int G_UP = 5;
+    final static int G_UP = 20 ;
     final static int G_DOWN = 5;
     final static int K0_EXCI = 0;	// Minimum number of excited neighbours to make a cell excited
 					// Smaller values of K0_EXCI represent higher excitabilities
@@ -57,17 +57,6 @@ public class GerhardtSchusterTyson {
 
             System.out.println("iter = " + iter++);
 
-            // if (!chopped && u[N/2][N/2] == 1) {
-            //     chopped = true;
-            //     for (int i = 0; i < N / 2; i++) {
-            //         for (int j = 0; j < N; j++) {
-            //             u[i][j] = 0;
-            //             v[i][j] = 0;
-            //         }
-            //     }
-            // }
-
-            // ----------- modified chopping for top left corner to produce one spiral near centre. 
             if (!chopped && u[N/2][N/2] == 1) {
                 chopped = true;
                 for (int i = 0; i < N / 2; i++) {
@@ -76,13 +65,18 @@ public class GerhardtSchusterTyson {
                         v[i][j] = 0;
                     }
                 }
-                for (int i = 0; i < N ; i++) {
-                    for (int j = 0; j < N/3; j++) {
-                        u[i][j] = 0;
-                        v[i][j] = 0;
-                    }
-                }
             }
+
+            // ----------- modified chopping for top left corner to produce one spiral near centre. 
+            // if (!chopped && u[N/6][N/6] == 1) {
+            //     chopped = true;
+            //     for (int i = 0; i < N / 6; i++) {
+            //         for (int j = 0; j < N; j++) {
+            //             u[i][j] = 0;
+            //             v[i][j] = 0;
+            //         }
+            //     }
+            // }
 
 
             // Calculate neighbour sums.

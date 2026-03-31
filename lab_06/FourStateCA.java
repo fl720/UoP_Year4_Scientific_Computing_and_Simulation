@@ -10,7 +10,7 @@ public class FourStateCA {
 
     final static int N = 100;                // grid size
     final static int CELL_SIZE = 2;         // pixel size of each cell
-    final static int DELAY = 100;           // ms between frames
+    final static int DELAY = 200;           // ms between frames
 
     // State and timer arrays
     static int[][] state = new int[N][N];
