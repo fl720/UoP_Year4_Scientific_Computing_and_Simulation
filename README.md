@@ -8,4 +8,10 @@ Relating to ：
 - Radio Interferometry with the van Cittert-Zernicke Theorem
 
 - Particle Simulation
+- HPP Model and FHP Model
 
+- Excited States
+
+- Lattice Boltmann Mothods (LBM)
+
+Within all these method, we discuss various methods related to parallise the simulation for speed up, using different illustation method to display our results.
