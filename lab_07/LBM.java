@@ -4,8 +4,8 @@ import javax.swing.* ;
 
 public class LBM {
 
-    final static int NITER = 30000 ;
-    // final static int NITER = 5000 ;
+    // final static int NITER = 30000 ;
+    final static int NITER = 5000 ;
 
     final static int NX = 520, NY = 180 ;  // Lattice dimensions
     final static int Q = 9 ;  // num states
@@ -21,7 +21,7 @@ public class LBM {
     final static double W2 = 1.0 / 36 ;
 
     final static int CELL_SIZE = 2 ; 
-    final static int OUTPUT_FREQ = 1 ;
+    final static int OUTPUT_FREQ = 100 ;
 
     static Display display = new Display() ;
 
@@ -120,17 +120,17 @@ public class LBM {
         // }
 
         // -----------------  Triangular obstacle
-        double base = 60;   
-        double height = 60; 
-        for(int i = 0; i < NX; i++) {
-            for(int j = 0; j < NY; j++) {
-                double x = i - cx;
-                double y = j - cy;
-                boolean inside = (x >= 0) && (x <= height) &&
-                                (Math.abs(y) <= (base/2) * (1 - x/height));
-                obstacle[i][j] = inside;
-            }
-        }
+        // double base = 60;   
+        // double height = 60; 
+        // for(int i = 0; i < NX; i++) {
+        //     for(int j = 0; j < NY; j++) {
+        //         double x = i - cx;
+        //         double y = j - cy;
+        //         boolean inside = (x >= 0) && (x <= height) &&
+        //                         (Math.abs(y) <= (base/2) * (1 - x/height));
+        //         obstacle[i][j] = inside;
+        //     }
+        // }
 
         // Inlet velocity with perturbation
         double [] [] vel = new double [NY] [2] ;
