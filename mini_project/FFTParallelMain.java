@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 
 public class FFTParallelMain {
 
-    public static int    N              = 4096; // REMEMBER change this for different image sizes (must be power of 2)!!!!!!!!!!!!!
+    public static int    N              = 4096; // !!! REMEMBER change this for different image sizes (must be power of 2)!!!!!!!!!!!!!
     public static int    NUM_THREADS    = Runtime.getRuntime().availableProcessors();
     public static String FILTER_TYPE    = "lowpass";
     public static int    CUTOFF_DIVISOR = 8;
@@ -38,44 +38,40 @@ public class FFTParallelMain {
         double [][] X = new double [N][N];
         readPNG(X, imagePath, N);
 
-        // Display 1: Original (No clone needed here as X is not modified)
         new DisplayDensity(X, N, "1. Original Image");
 
         double [][] CRe = new double [N][N], CIm = new double [N][N];
         for (int i = 0; i < N; i++) System.arraycopy(X[i], 0, CRe[i], 0, N);
 
-        // --- Step 1: Forward FFT ---
+        // --- Forward FFT SECTION ---
         long start = System.nanoTime();
         fft2dParallel(CRe, CIm, 1);
         long end = System.nanoTime();
         System.out.println("Forward FFT: " + (end - start)/1e6 + " ms");
 
-        // Display 2: Spectrum (CRITICAL: Must clone to avoid interference from filtering)
+        // Spectrum 
         double[][] CReCopy = deepCopy(CRe);
         double[][] CImCopy = deepCopy(CIm);
         new Display2dFT(CReCopy, CImCopy, N, "2. Discrete FT (Spectrum)");
 
-        // --- Step 2: Filtering ---
+        // --- Filtering SECTION ---
         applyFilter(CRe, CIm, FILTER_TYPE, CUTOFF_DIVISOR);
 
-        // --- Step 3: Inverse FFT ---
+        // --- Inverse FFT SECTION ---
         start = System.nanoTime();
         fft2dParallel(CRe, CIm, -1);
         end = System.nanoTime();
         System.out.println("Inverse FFT: " + (end - start)/1e6 + " ms");
 
-        // Scaling
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) CRe[i][j] /= (N * N);
         }
 
-        // Display 3: Result
         new DisplayDensity(CRe, N, "3. Reconstructed Image");
 
         pool.shutdown();
     }
 
-    // Helper: Deep copy a 2D array
     private static double[][] deepCopy(double[][] original) {
         double[][] copy = new double[N][N];
         for (int i = 0; i < N; i++) System.arraycopy(original[i], 0, copy[i], 0, N);
@@ -111,8 +107,6 @@ public class FFTParallelMain {
         double[][] r = new double[size][size], i = new double[size][size];
         for (int n = 0; n < iter; n++) { fft2dParallel(r, i, 1); fft2dParallel(r, i, -1); }
     } 
-
-    // --- Original FFT Helper Methods ---
 
     public static void fft1d(double [] re, double [] im, int isgn) {
         final double pi = Math.PI ;
